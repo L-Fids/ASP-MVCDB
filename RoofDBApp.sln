@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoofDBApp.UI", "RoofDBApp\RoofDBApp.UI.csproj", "{DE7F21D8-9CA6-411B-8873-F8827DE44B07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoofDBApp.DataLibrary", "RoofDBApp.DataLibrary\RoofDBApp.DataLibrary.csproj", "{5FE6DC7D-F895-4688-B139-2DD6089F2371}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoofDBApp.UnitTests", "RoofDBApp.UnitTests\RoofDBApp.UnitTests.csproj", "{BA585E15-8316-4EA6-9CEA-A0FF7FEEB173}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE7F21D8-9CA6-411B-8873-F8827DE44B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE7F21D8-9CA6-411B-8873-F8827DE44B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE7F21D8-9CA6-411B-8873-F8827DE44B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE7F21D8-9CA6-411B-8873-F8827DE44B07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FE6DC7D-F895-4688-B139-2DD6089F2371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FE6DC7D-F895-4688-B139-2DD6089F2371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FE6DC7D-F895-4688-B139-2DD6089F2371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FE6DC7D-F895-4688-B139-2DD6089F2371}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA585E15-8316-4EA6-9CEA-A0FF7FEEB173}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA585E15-8316-4EA6-9CEA-A0FF7FEEB173}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA585E15-8316-4EA6-9CEA-A0FF7FEEB173}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA585E15-8316-4EA6-9CEA-A0FF7FEEB173}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {02185227-165B-4BE0-B3E9-9A30C0470BF4}
+	EndGlobalSection
+EndGlobal
