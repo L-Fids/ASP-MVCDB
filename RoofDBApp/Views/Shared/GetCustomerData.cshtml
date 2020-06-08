@@ -1,0 +1,25 @@
+﻿@model IEnumerable<RoofDBApp.Models.CustomerViewModel>
+
+    @*Partial View that returns properly structured customer entries*@
+    @foreach (var customer in Model)
+    {
+        <div class="grid-content">
+            <div class="grid-inner">
+                <div class="customer-name">@customer.FirstName  @customer.LastName</div>
+                <div class="customer-address">@Html.Label("Address:")  @customer.Address</div>
+                <div class="customer-city">@Html.Label("City:")  @customer.City</div>
+                <div class="customer-province">@Html.Label("Province:")  @customer.Province</div>
+                <div class="customer-postalcode">@Html.Label("Postal Code:")  @customer.PostalCode</div>
+                <div class="customer-phone">@Html.Label("Phone:")  @customer.PhoneNumber</div>
+                <div class="customer-email">@Html.Label("E-mail:")  @customer.Email</div>
+                <div class="customer-source">@Html.Label("Lead Source:")  @customer.LeadSource</div>
+                <div class="customer-status">@Html.Label("Status:")  @customer.Status</div>
+                <div class="customer-notes">@Html.Label("Notes:")  @customer.Notes</div>
+            </div>
+                <div class="crud-options">
+                    @Html.ActionLink("Details", "Details", new { id = customer.CustomerID }, new { @class = "btn btn-info btn-xs" })
+                    @Html.ActionLink("Edit", "Edit", new { id = customer.CustomerID }, new { @class = "btn btn-primary btn-xs" })
+                    @Html.ActionLink("Delete", "Delete", new { id = customer.CustomerID }, new { @class = "btn btn-danger btn-xs" })
+                </div>
+        </div>
+    }

@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusinessLogic\CustomerProcessor.cs" />
+    <Compile Include="BusinessLogic\FinancialProcessor.cs" />
     <Compile Include="DataAccess\SqlDataAccess.cs" />
     <Compile Include="Models\CustomerDataModel.cs" />
     <Compile Include="Models\FinancialDataModel.cs" />

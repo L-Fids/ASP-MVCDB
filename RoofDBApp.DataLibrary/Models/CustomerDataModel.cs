@@ -16,6 +16,7 @@ namespace RoofDBApp.DataLibrary.Models
         public string LastName { get; set; }
         public string Address { get; set; }
         public string City { get; set; }
+        public string Province { get; set; }
         public string PostalCode { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
@@ -23,9 +24,7 @@ namespace RoofDBApp.DataLibrary.Models
         public string Status { get; set; }
         public string Notes { get; set; }
 
-        // Financial Table Properties
-        public decimal? Quote { get; set; }
-        public decimal? FinalPrice { get; set; }
-        public decimal? Commission { get; set; }
+        // Financial Model Object
+        public FinancialDataModel FinancialData { get; set; }
     }
 }

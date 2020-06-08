@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace RoofDBApp.Models
 {
@@ -11,6 +12,7 @@ namespace RoofDBApp.Models
         // UI MODEL
 
         // Customer Model Properties
+        [HiddenInput(DisplayValue=false)]
         public int CustomerID { get; set; }
 
         [Display(Name = "First Name")]
@@ -26,7 +28,10 @@ namespace RoofDBApp.Models
 
         [Display(Name = "City")]
         public string City { get; set; }
-        
+
+        [Display(Name = "Province")]
+        public string Province { get; set; }
+
         [Display(Name = "Postal Code")]
         public string PostalCode { get; set; }
 
@@ -45,6 +50,9 @@ namespace RoofDBApp.Models
         public string Notes { get; set; }
 
         // Financial Model Properties
+        [HiddenInput(DisplayValue = false)]
+        public int? FinancialID { get; set; }
+        
         [Display(Name = "Quotes")]
         public decimal? Quote { get; set; }
 

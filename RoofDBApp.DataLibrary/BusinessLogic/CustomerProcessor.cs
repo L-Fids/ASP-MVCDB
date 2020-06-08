@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace RoofDBApp.DataLibrary.BusinessLogic
 {
-    // Not a true 3-tier app here. We have the business logic and data access in the same physical tier, though they have some logical separation.
     // TODO: Work on adding dependency inversion.
     public static class CustomerProcessor
     {
@@ -33,14 +32,12 @@ namespace RoofDBApp.DataLibrary.BusinessLogic
             string sql = @"SELECT * FROM Customer WHERE CustomerID = @CustomerID";
 
             return SqlDataAccess.LoadSingle<CustomerDataModel>(sql, parameter);
-
-            //return SqlDataAccess.LoadSingleData<CustomerDataModel>(sql, parameter);
         }
 
         // CREATE a new customer in the DB, 
         public static int CreateCustomer(string firstName, string lastName,
-            string address, string city, string postalCode, string phoneNumber, string email, string leadSource, string status, 
-            string notes, decimal? quote, decimal? finalPrice, decimal? commission)
+            string address, string city, string province, string postalCode, string phoneNumber, string email, string leadSource, string status, 
+            string notes)
         {
             CustomerDataModel data = new CustomerDataModel // mapping the UI model to the DataLibrary model
             {
@@ -48,25 +45,23 @@ namespace RoofDBApp.DataLibrary.BusinessLogic
                 LastName = lastName,
                 Address = address,
                 City = city,
+                Province = province,
                 PostalCode = postalCode,
                 PhoneNumber = phoneNumber,
                 Email = email,
                 LeadSource = leadSource,
                 Status = status,
                 Notes = notes,
-                Quote = quote,
-                FinalPrice = finalPrice,
-                Commission = commission
             };
-
-
+            
             string sql = @"INSERT INTO Customer
-                           (FirstName, LastName, Address, City, PostalCode, PhoneNumber, Email, LeadSource, Status, Notes)
+                           (FirstName, LastName, Address, City, Province, PostalCode, PhoneNumber, Email, LeadSource, Status, Notes)
                             VALUES 
-                           (@FirstName, @LastName, @Address, @City, @PostalCode, @PhoneNumber, @Email, @LeadSource, @Status, @Notes)";
+                           (@FirstName, @LastName, @Address, @City, @Province, @PostalCode, @PhoneNumber, @Email, @LeadSource, @Status, @Notes)";
             
             return SqlDataAccess.SaveData(sql, data);
         }
+
 
         //DELETE a record from the DB
         public static int DeleteCustomer(int id)
@@ -82,7 +77,7 @@ namespace RoofDBApp.DataLibrary.BusinessLogic
 
         //UPDATE a record from the DB
         public static int UpdateCustomer(int id, string firstName, string lastName,
-            string address, string city, string postalCode, string phoneNumber, string email, string leadSource, string status,
+            string address, string city, string province, string postalCode, string phoneNumber, string email, string leadSource, string status,
             string notes)
         {
             var parameter = new DynamicParameters();
@@ -95,6 +90,7 @@ namespace RoofDBApp.DataLibrary.BusinessLogic
                 LastName = lastName,
                 Address = address,
                 City = city,
+                Province = province,
                 PostalCode = postalCode,
                 PhoneNumber = phoneNumber,
                 Email = email,
@@ -109,6 +105,7 @@ namespace RoofDBApp.DataLibrary.BusinessLogic
                            LastName = @LastName,
                            Address = @Address,
                            City = @City,
+                           Province = @Province,
                            PostalCode = @PostalCode,
                            PhoneNumber = @PhoneNumber,
                            Email = @Email,
@@ -120,44 +117,115 @@ namespace RoofDBApp.DataLibrary.BusinessLogic
             return SqlDataAccess.SaveData(sql, data);
         }
         
-        // multi mapping queries take 4 arguments: 1) SQL Query 2) Mapping Function 
-        // 3) Command Parameter(id in this case) 4) spliton string (where to split the model)
-        public static List<CustomerDataModel> LoadMultiMap(int id)
+        // MULTI-MAPPING QUERIES
+
+        // New and improved multi-map query that uses the sql access layer's generic multi map function
+        public static CustomerDataModel LoadMultiMap(int id)
         {
-                        
+            var parameter = new DynamicParameters();
+            parameter.Add("CustomerID", id);
+
+            string sql = @"SELECT cu.*, fi.*
+                           FROM Customer cu
+                           LEFT JOIN Financials fi
+                               ON cu.CustomerID = fi.CustomerID
+                            WHERE cu.CustomerID = @CustomerID";
+
+            // What column should dapper use to differentiate the objects.
+            string splitCategory = "FinancialID";
+
+            // return the customer object with a financial object attached.
+            return SqlDataAccess.LoadDataSingleMultiMap<CustomerDataModel, FinancialDataModel, CustomerDataModel>(
+                sql,
+                MapResults,
+                new { @CustomerID = id },
+                splitCategory);
+        }
+
+        public static List<CustomerDataModel> MultipleMultiMap()
+        {
             // Left Join the Customer and Financial Tables
             string sql = @"SELECT cu.*, fi.*
                            FROM Customer cu
                            LEFT JOIN Financials fi
                                ON cu.CustomerID = fi.CustomerID";
 
-            // Grab the data and map the Financial class data onto the FiancialDataModel property of the Customer class
-            using (IDbConnection connection = new SqlConnection(GetConnectionString()))
-            {
-                return connection.Query<CustomerDataModel, FinancialDataModel, CustomerDataModel>(
+            string splitCategory = "FinancialID";
+
+            return SqlDataAccess.LoadDataMultiMap<CustomerDataModel, FinancialDataModel, CustomerDataModel>(
                     sql,
                     MapResults,
-                    new { @CustomerID = id },
-                    splitOn: "FinancialID").ToList();
-            }
-
-            //new { @CustomerID = id },    
-            //return SqlDataAccess.LoadData<CustomerDataModel>(sql);
+                    splitCategory);
         }
 
-        // Mapping function - hopefully will not need this once I can figure out how to properly setup a generic multi mapping query.
+        // Mapping function for multiple table queries.
         private static CustomerDataModel MapResults (CustomerDataModel customer, FinancialDataModel financial) 
         {
-            customer.Quote = financial.Quote;
-            customer.FinalPrice = financial.FinalPrice;
-            customer.Commission = financial.Commission;
-            return customer;
+            if (financial != null)
+            {
+                customer.FinancialData = financial;
+                return customer;
+            }
+            else
+            {
+                FinancialDataModel generateModel = new FinancialDataModel();
+                customer.FinancialData = generateModel;
+                return customer;
+            }
         }
-        
-        // Need this until I can figure out how to properly setup a generic multi mapping query in my data access class.
-        public static string GetConnectionString()
+
+
+        // CREATE a new customer in the DB, 
+        public static int CreateCustomerWithFinancial(string firstName, string lastName,
+            string address, string city, string province, string postalCode, string phoneNumber, string email, string leadSource, string status,
+            string notes)
         {
-            return ConfigurationManager.ConnectionStrings["RoofDBConnection"].ConnectionString;
+            CustomerDataModel data = new CustomerDataModel // mapping the UI model to the DataLibrary model
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Address = address,
+                City = city,
+                Province = province,
+                PostalCode = postalCode,
+                PhoneNumber = phoneNumber,
+                Email = email,
+                LeadSource = leadSource,
+                Status = status,
+                Notes = notes,
+            };
+
+            string sql = @"INSERT INTO Customer
+                           (FirstName, LastName, Address, City, Province, PostalCode, PhoneNumber, Email, LeadSource, Status, Notes)
+                            VALUES 
+                           (@FirstName, @LastName, @Address, @City, @Province, @PostalCode, @PhoneNumber, @Email, @LeadSource, @Status, @Notes);
+                           SELECT CAST(SCOPE_IDENTITY() as int)";
+
+            return SqlDataAccess.SaveData(sql, data);
         }
+
+
+        // Map the View Model to the Data Model (want to implement this for testability purposes)
+
+        //public static CustomerDataModel ViewModelToDataModel(string firstName, string lastName,
+        //    string address, string city, string postalCode, string phoneNumber, string email, string leadSource, string status,
+        //    string notes)
+        //{
+        //    CustomerDataModel dataModel = new CustomerDataModel 
+        //    {
+        //        FirstName = firstName,
+        //        LastName = lastName,
+        //        Address = address,
+        //        City = city,
+        //        PostalCode = postalCode,
+        //        PhoneNumber = phoneNumber,
+        //        Email = email,
+        //        LeadSource = leadSource,
+        //        Status = status,
+        //        Notes = notes,
+        //    };
+
+        //    return dataModel;
+        //}
     }
 }

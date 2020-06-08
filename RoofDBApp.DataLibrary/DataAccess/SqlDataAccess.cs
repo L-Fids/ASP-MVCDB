@@ -7,11 +7,10 @@ using Dapper;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using RoofDBApp.DataLibrary.Models;
 
 namespace RoofDBApp.DataLibrary.DataAccess
 {
-    public static class SqlDataAccess // might as well be static, not going to store data here
+    public static class SqlDataAccess
     {
         public static string GetConnectionString()
         {
@@ -42,6 +41,15 @@ namespace RoofDBApp.DataLibrary.DataAccess
             }
         }
 
+        // WORK IN PROGRESS NOT USEABLE
+        public static T SaveDataReturnID<T>(string sql, T data)
+        {
+            using (IDbConnection connection = new SqlConnection(GetConnectionString()))
+            {
+                return connection.Query<T>(sql, data).Single();
+            }
+        }
+
         public static int SaveData<T>(string sql, T data)
         {
             using (IDbConnection connection = new SqlConnection(GetConnectionString()))
@@ -58,13 +66,27 @@ namespace RoofDBApp.DataLibrary.DataAccess
             }
         }
 
-        
-        //public static List<T> LoadDataMultiple<T>(string sql, T entity1, T entity2, T entity3, string splitOn)
-        //{
-        //    using (IDbConnection connection = new SqlConnection(GetConnectionString()))
-        //    {
-        //        return connection.Query<T, T, T>(sql, (entity1, entity2),).ToList();
-        //    }
-        //}
+        public static V LoadDataSingleMultiMap<T,U,V>(string sql, Func<T, U, V> mapResults, Object declareScalar, string splitCategory)
+        {
+            using (IDbConnection connection = new SqlConnection(GetConnectionString()))
+            {
+                return connection.Query<T, U, V>(
+                    sql,
+                    mapResults,
+                    declareScalar,
+                    splitOn: splitCategory).First();
+            }
+        }
+
+        public static List<V> LoadDataMultiMap<T, U, V>(string sql, Func<T, U, V> mapResults, string splitCategory)
+        {
+            using (IDbConnection connection = new SqlConnection(GetConnectionString()))
+            {
+                return connection.Query<T, U, V>(
+                    sql,
+                    mapResults,
+                    splitOn: splitCategory).ToList();
+            }
+        }
     }
 }
